@@ -7,7 +7,14 @@ const routes: Routes = [
     loadChildren: () =>
       import('./games/games.module').then((m) => m.GamesModule),
   },
-  { path: '**', redirectTo: 'games' },
+  {
+    path: 'appointments',
+    loadChildren: () =>
+      import('./appointments/appointments.module').then(
+        (m) => m.AppointmentsModule
+      ),
+  },
+  { path: '**', redirectTo: 'appointments' },
 ];
 
 @NgModule({

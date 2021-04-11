@@ -1,0 +1,33 @@
+mat-card {
+  width: 180px;
+  margin: 16px;
+  cursor: pointer;
+  outline: 0;
+
+  &:hover {
+    // TODO Mixin definieren
+    // TODO Farben aus Paletten holen
+    background-color: black;
+    color: white;
+  }
+
+  mat-card-content {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 16px;
+
+    div {
+      display: flex;
+      align-items: center;
+      font-size: 150%;
+
+      &.open-payment {
+        color: red;
+      }
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}

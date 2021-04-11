@@ -1,0 +1,28 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar><mat-icon>control_point</mat-icon></div>
+      <mat-card-title>Neu</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      Erstelle oder plane einen neuen Termin.
+    </mat-card-content>
+  </mat-card>
+  <mat-card
+    *ngFor="let appointment of appointments$ | async"
+    [routerLink]="['/games/appointment/', appointment.id]"
+  >
+    <mat-card-header>
+      <div mat-card-avatar><mat-icon>insert_invitation</mat-icon></div>
+      <mat-card-title>{{ appointment.date | date }}</mat-card-title>
+      <mat-card-subtitle>
+        {{ appointment.presentMembers.length }} anwesend
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div [class.open-payment]="appointment.openPaymentAmount > 0">
+        {{ appointment.openPaymentAmount | currency: "EUR" }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
