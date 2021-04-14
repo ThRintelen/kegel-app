@@ -3,11 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'games',
-    loadChildren: () =>
-      import('./games/games.module').then((m) => m.GamesModule),
-  },
-  {
     path: 'appointments',
     loadChildren: () =>
       import('./appointments/appointments.module').then(

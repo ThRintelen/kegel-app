@@ -10,7 +10,7 @@
   </mat-card>
   <mat-card
     *ngFor="let appointment of appointments$ | async"
-    [routerLink]="['/games/appointment/', appointment.id]"
+    [routerLink]="['/appointments', appointment.id, 'games']"
   >
     <mat-card-header>
       <div mat-card-avatar><mat-icon>insert_invitation</mat-icon></div>

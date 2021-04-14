@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Game } from '../games.model';
+import { GamesService } from '../games.service';
 
 @Component({
   selector: 'app-games',
@@ -7,7 +10,11 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamesComponent implements OnInit {
-  constructor() {}
+  games$!: Observable<Game[]>;
 
-  ngOnInit() {}
+  constructor(private readonly gamesService: GamesService) {}
+
+  ngOnInit() {
+    this.games$ = this.gamesService.getGames$();
+  }
 }
