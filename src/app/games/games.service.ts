@@ -8,6 +8,18 @@ import { Game } from './games.model';
 export class GamesService {
   constructor() {}
 
+  getGame$(id: string): Observable<Game> {
+    console.log(id);
+
+    return of({
+      id: '1',
+      name: 'Hohe Hausnummer',
+      description: 'Wer mit drei würfen die höchste Zahl hat, gewinnt.',
+      groupGame: false,
+      penalty: 1,
+    });
+  }
+
   getGames$(): Observable<Game[]> {
     const games: Game[] = [
       {
@@ -15,7 +27,7 @@ export class GamesService {
         name: 'Hohe Hausnummer',
         description: 'Wer mit drei würfen die höchste Zahl hat, gewinnt.',
         groupGame: false,
-        penalty: 1,
+        penalty: 0.5,
       },
       {
         id: '2',
@@ -23,6 +35,13 @@ export class GamesService {
         description: 'Wer mit drei würfen die niedrigste Zahl hat, gewinnt.',
         groupGame: false,
         penalty: 1,
+      },
+      {
+        id: '2',
+        name: 'Lotto',
+        description: 'Verliere den Geldbetrag',
+        groupGame: false,
+        penalty: 'flex',
       },
     ];
 
