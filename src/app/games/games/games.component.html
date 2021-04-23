@@ -1,6 +1,7 @@
 <div class="container">
   <mat-card *ngFor="let game of games$ | async" [routerLink]="[game.id]">
     <mat-card-header>
+      <div mat-card-avatar><mat-icon>radio_button_unchecked</mat-icon></div>
       <mat-card-title>{{ game.name }}</mat-card-title>
       <mat-card-subtitle>{{
         game.groupGame ? "Gruppenspiel" : "Einzelspiel"

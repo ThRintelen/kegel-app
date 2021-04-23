@@ -5,10 +5,10 @@ import { Observable, zip } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { AppointmentResultType } from 'src/app/appointments/store.model';
 import { AppointmentStoreService } from 'src/app/appointments/store.service';
+import { Player } from '../../..//player/player.model';
+import { PlayersService } from '../../../player/player.service';
 import { Game } from '../../games.model';
 import { GamesService } from '../../games.service';
-import { Player } from '../../player.model';
-import { PlayersService } from '../../player.service';
 
 // TODO unsubscribe
 // TODO Seite optisch aufbereiten

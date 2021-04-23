@@ -1,5 +1,10 @@
 <div class="container" *ngIf="data$ | async as data">
   <h1>{{ data[1].name }}</h1>
+  <p>
+    Bitte die Spieler markieren, die dieses Spiel verloren haben.<br />
+    Die Strafe pro Spieler beträgt
+    <b>{{ data[1].penalty | currency: "EUR" }}</b>
+  </p>
   <mat-selection-list #players>
     <mat-list-option *ngFor="let player of data[0]" [value]="player">
       {{ player.name }}

@@ -2,13 +2,9 @@ mat-card {
   width: 180px;
   margin: 16px;
   cursor: pointer;
-  outline: 0;
 
   &:hover {
-    // TODO Mixin definieren
-    // TODO Farben aus Paletten holen
-    background-color: black;
-    color: white;
+    filter: brightness(0.9);
   }
 
   mat-card-content {
