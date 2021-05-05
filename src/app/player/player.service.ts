@@ -13,11 +13,11 @@ export class PlayersService {
 
     const players: Player[] = [
       {
-        id: '1',
+        id: 'csdcs-csdc-dscs',
         name: 'Herbert Peters',
       },
       {
-        id: '2',
+        id: 'dscds-cdscds',
         name: 'Thorsten Rintelen',
       },
     ];

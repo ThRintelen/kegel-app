@@ -1,21 +1,46 @@
 <div class="container" *ngIf="data$ | async as data">
-  <h1>{{ data[1].name }}</h1>
-  <p>
+  <h1>{{ data.game.name }}</h1>
+  <p *ngIf="data.game.penalty === penaltyType.Flex">
+    Bitte zu jedem Spieler den fälligen Geldbetrag angeben.
+  </p>
+
+  <p *ngIf="data.game.penalty !== penaltyType.Flex">
     Bitte die Spieler markieren, die dieses Spiel verloren haben.<br />
     Die Strafe pro Spieler beträgt
-    <b>{{ data[1].penalty | currency: "EUR" }}</b>
+    <b>{{ data.game.penalty | currency: "EUR" }}</b>
   </p>
-  <mat-selection-list #players>
-    <mat-list-option *ngFor="let player of data[0]" [value]="player">
-      {{ player.name }}
-    </mat-list-option>
-  </mat-selection-list>
+  <form [formGroup]="form">
+    <mat-selection-list>
+      <mat-list-item *ngFor="let player of data.players; let last = last">
+        <div class="row">
+          {{ player.name }}
 
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="onClickSubmit(players, data[1])"
-  >
-    Speichern
-  </button>
+          <mat-form-field
+            appearance="fill"
+            *ngIf="data.game.penalty === penaltyType.Flex"
+          >
+            <mat-label>Betrag in €</mat-label>
+            <input [formControlName]="player.id" type="number" matInput />
+          </mat-form-field>
+
+          <mat-checkbox
+            *ngIf="data.game.penalty !== penaltyType.Flex"
+            [formControlName]="player.id"
+            [value]="data.game.penalty.toString()"
+          ></mat-checkbox>
+        </div>
+        <mat-divider *ngIf="!last"> </mat-divider>
+      </mat-list-item>
+    </mat-selection-list>
+
+    <button mat-raised-button [routerLink]="['..']">Zurück</button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onClickSubmit(data.game, data.players)"
+    >
+      Speichern
+    </button>
+  </form>
 </div>

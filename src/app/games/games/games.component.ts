@@ -3,6 +3,9 @@ import { Observable } from 'rxjs';
 import { Game } from '../games.model';
 import { GamesService } from '../games.service';
 
+// TODO Gespielte Spiele markieren mit Anzahl wie oft
+// TODO 2. Spiel muss möglich sein.
+
 @Component({
   selector: 'app-games',
   templateUrl: './games.component.html',

@@ -2,3 +2,15 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+mat-sidenav-content {
+  background-color: whitesmoke;
+}
+
+mat-sidenav {
+  width: 300px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

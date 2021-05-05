@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { MatSelectionList } from '@angular/material/list';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, zip } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { AppointmentResultType } from 'src/app/appointments/store.model';
 import { AppointmentStoreService } from 'src/app/appointments/store.service';
 import { Player } from '../../..//player/player.model';
 import { PlayersService } from '../../../player/player.service';
-import { Game } from '../../games.model';
+import { Game, PenaltyType } from '../../games.model';
 import { GamesService } from '../../games.service';
 
 // TODO unsubscribe
 // TODO Seite optisch aufbereiten
-// TODO flex Type bauen (Lotto)
-
+// TODO Validierungen
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -21,7 +20,10 @@ import { GamesService } from '../../games.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamesDetailComponent implements OnInit {
-  data$!: Observable<[Player[], Game]>;
+  penaltyType = PenaltyType;
+  data$!: Observable<{ players: Player[]; game: Game }>;
+
+  form = new FormGroup({});
 
   constructor(
     private readonly playersService: PlayersService,
@@ -35,24 +37,33 @@ export class GamesDetailComponent implements OnInit {
     const players$ = this.route.params.pipe(
       switchMap(({ appointmentId }) =>
         this.playersService.getPlayers$(appointmentId)
-      )
+      ),
+      tap((players) => {
+        players.forEach((player) => {
+          const field = new FormControl('');
+          this.form.addControl(player.id, field);
+        });
+      })
     );
 
     const game$ = this.route.params.pipe(
       switchMap(({ gameId }) => this.gamesService.getGame$(gameId))
     );
 
-    this.data$ = zip(players$, game$);
+    this.data$ = zip(players$, game$).pipe(
+      map((data) => ({ game: data[1], players: data[0] }))
+    );
   }
 
-  onClickSubmit(players: MatSelectionList, game: Game) {
-    this.route.params.subscribe(({ gameId, appointmentId }) => {
-      players.selectedOptions.selected.forEach(({ value }) => {
+  onClickSubmit(game: Game, players: Player[]) {
+    this.route.params.subscribe(({ appointmentId }) => {
+      players.forEach((player) => {
         this.appointmentStoreService.addResult({
-          id: gameId,
+          appointmentId,
+          id: game.id,
           type: AppointmentResultType.Game,
-          playerId: value.id,
-          amount: game.penalty === 'flex' ? 0 : game.penalty,
+          playerId: player.id,
+          amount: this.form.value[player.id],
         });
       });
 

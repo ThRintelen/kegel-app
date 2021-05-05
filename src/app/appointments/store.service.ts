@@ -1,16 +1,25 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AppointmentResult } from './store.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppointmentStoreService {
-  private results: AppointmentResult[] = [];
+  private results$ = new BehaviorSubject<AppointmentResult[]>([]);
 
   constructor() {}
 
+  getResults$(): Observable<AppointmentResult[]> {
+    return this.results$.asObservable();
+  }
+
   addResult(result: AppointmentResult) {
-    this.results.push(result);
-    console.log(this.results);
+    const currentResults = this.results$.value;
+    currentResults.push(result);
+
+    this.results$.next(currentResults);
+
+    console.log(this.results$.value);
   }
 }

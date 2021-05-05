@@ -4,6 +4,7 @@ export enum AppointmentResultType {
 }
 
 export interface AppointmentResult {
+  appointmentId: string;
   id: string; // ID des Spiels oder der Strafe
   type: AppointmentResultType;
   playerId: string;
