@@ -26,7 +26,6 @@
           <mat-checkbox
             *ngIf="data.game.penalty !== penaltyType.Flex"
             [formControlName]="player.id"
-            [value]="data.game.penalty.toString()"
           ></mat-checkbox>
         </div>
         <mat-divider *ngIf="!last"> </mat-divider>

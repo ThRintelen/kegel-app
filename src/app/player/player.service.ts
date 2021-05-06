@@ -8,9 +8,7 @@ import { Player } from './player.model';
 export class PlayersService {
   constructor() {}
 
-  getPlayers$(appointmentId: string): Observable<Player[]> {
-    console.log(appointmentId);
-
+  getPlayers$(_appointmentId: string): Observable<Player[]> {
     const players: Player[] = [
       {
         id: 'csdcs-csdc-dscs',

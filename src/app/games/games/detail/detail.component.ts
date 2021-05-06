@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Observable, zip } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { AppointmentResultType } from 'src/app/appointments/store.model';
@@ -10,9 +11,9 @@ import { PlayersService } from '../../../player/player.service';
 import { Game, PenaltyType } from '../../games.model';
 import { GamesService } from '../../games.service';
 
-// TODO unsubscribe
 // TODO Seite optisch aufbereiten
 // TODO Validierungen
+@UntilDestroy()
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -56,18 +57,28 @@ export class GamesDetailComponent implements OnInit {
   }
 
   onClickSubmit(game: Game, players: Player[]) {
-    this.route.params.subscribe(({ appointmentId }) => {
-      players.forEach((player) => {
-        this.appointmentStoreService.addResult({
-          appointmentId,
-          id: game.id,
-          type: AppointmentResultType.Game,
-          playerId: player.id,
-          amount: this.form.value[player.id],
-        });
-      });
+    this.route.params
+      .pipe(untilDestroyed(this))
+      .subscribe(({ appointmentId }) => {
+        players.forEach((player) => {
+          let amount = 0;
 
-      this.router.navigate(['/appointments', appointmentId, 'games']);
-    });
+          if (game.penalty === PenaltyType.Flex) {
+            amount = this.form.value[player.id];
+          } else if (this.form.value[player.id]) {
+            amount = game.penalty;
+          }
+
+          this.appointmentStoreService.addResult({
+            appointmentId,
+            id: game.id,
+            type: AppointmentResultType.Game,
+            playerId: player.id,
+            amount,
+          });
+        });
+
+        this.router.navigate(['/appointments', appointmentId, 'games']);
+      });
   }
 }

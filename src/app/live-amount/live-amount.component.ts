@@ -22,6 +22,7 @@ export class LiveAmountComponent implements OnInit {
 
   // TODO unsubscribe
   // TODO Berchung in einen Servie auslagern
+  // TODO Rename - live
 
   ngOnInit() {
     this.data$ = this.route.params.pipe(
