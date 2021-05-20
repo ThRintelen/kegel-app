@@ -15,6 +15,10 @@
         <div class="row">
           {{ player.name }}
 
+          <button mat-icon-button (click)="openDialog(player, data.players)">
+            <mat-icon>euro_symbol</mat-icon>
+          </button>
+
           <mat-form-field
             appearance="fill"
             *ngIf="data.game.penalty === penaltyType.Flex"
@@ -32,8 +36,6 @@
       </mat-list-item>
     </mat-selection-list>
 
-    <button mat-raised-button [routerLink]="['..']">Zurück</button>
-
     <button
       mat-raised-button
       color="primary"
@@ -41,5 +43,6 @@
     >
       Speichern
     </button>
+    <button mat-raised-button [routerLink]="['..']">Zurück</button>
   </form>
 </div>

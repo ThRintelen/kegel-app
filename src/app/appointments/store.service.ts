@@ -15,11 +15,9 @@ export class AppointmentStoreService {
   }
 
   addResult(result: AppointmentResult) {
-    const currentResults = this.results$.value;
+    const currentResults = [...this.results$.value];
     currentResults.push(result);
 
     this.results$.next(currentResults);
-
-    console.log(this.results$.value);
   }
 }

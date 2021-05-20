@@ -1,11 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Observable, zip } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { AppointmentResultType } from 'src/app/appointments/store.model';
 import { AppointmentStoreService } from 'src/app/appointments/store.service';
+import { PenaltyComponent } from 'src/app/penalty/penalty.component';
+import {
+  PenaltyAction,
+  PenaltyDialogResult,
+} from 'src/app/penalty/penalty.model';
 import { Player } from '../../..//player/player.model';
 import { PlayersService } from '../../../player/player.service';
 import { Game, PenaltyType } from '../../games.model';
@@ -13,6 +19,7 @@ import { GamesService } from '../../games.service';
 
 // TODO Seite optisch aufbereiten
 // TODO Validierungen
+// TODO Auslagern der Berechnungen in Services
 @UntilDestroy()
 @Component({
   selector: 'app-detail',
@@ -31,7 +38,8 @@ export class GamesDetailComponent implements OnInit {
     private readonly gamesService: GamesService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly appointmentStoreService: AppointmentStoreService
+    private readonly appointmentStoreService: AppointmentStoreService,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -79,6 +87,67 @@ export class GamesDetailComponent implements OnInit {
         });
 
         this.router.navigate(['/appointments', appointmentId, 'games']);
+      });
+  }
+
+  openDialog(player: Player, players: Player[]) {
+    this.dialog
+      .open(PenaltyComponent, {
+        data: player,
+        width: '80%',
+        autoFocus: false,
+      })
+      .afterClosed()
+      .pipe(
+        untilDestroyed(this),
+        filter((dialogResponse) => !!dialogResponse),
+        switchMap((dialogResponse: PenaltyDialogResult) =>
+          this.route.params.pipe(
+            map(({ appointmentId }) => ({ dialogResponse, appointmentId }))
+          )
+        )
+      )
+      .subscribe(({ dialogResponse, appointmentId }) => {
+        const result = {
+          appointmentId,
+          id: dialogResponse.penalty.id,
+          type: AppointmentResultType.Penalty,
+          playerId: dialogResponse.player.id,
+          amount: dialogResponse.penalty.penalty,
+        };
+
+        if (dialogResponse.action === PenaltyAction.Add) {
+          if (dialogResponse.penalty.inverse) {
+            players
+              .filter(({ id }) => id !== dialogResponse.player.id)
+              .forEach((player) => {
+                this.appointmentStoreService.addResult({
+                  ...result,
+                  playerId: player.id,
+                });
+              });
+          } else {
+            this.appointmentStoreService.addResult(result);
+          }
+        }
+
+        if (dialogResponse.action === PenaltyAction.Remove) {
+          const amount = dialogResponse.penalty.penalty * -1;
+
+          if (dialogResponse.penalty.inverse) {
+            players
+              .filter(({ id }) => id !== dialogResponse.player.id)
+              .forEach((player) => {
+                this.appointmentStoreService.addResult({
+                  ...result,
+                  amount,
+                  playerId: player.id,
+                });
+              });
+          } else {
+            this.appointmentStoreService.addResult({ ...result, amount });
+          }
+        }
       });
   }
 }

@@ -8,7 +8,12 @@
       </div>
       <mat-card-title>{{ game.name }}</mat-card-title>
       <mat-card-subtitle>
-        {{ game.groupGame ? "Gruppenspiel" : "Einzelspiel" }}
+        {{ game.groupGame ? "Gruppenspiel" : "Einzelspiel" }} -
+        {{
+          game.penalty === penaltyType.Flex
+            ? "freier Betrag"
+            : (game.penalty | currency: "EUR")
+        }}
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppointmentResultType } from 'src/app/appointments/store.model';
 import { AppointmentStoreService } from '../../appointments/store.service';
-import { Game } from '../games.model';
+import { Game, PenaltyType } from '../games.model';
 import { GamesService } from '../games.service';
 
 type GamesPlayed = (Game & { played: boolean })[];
@@ -15,6 +15,7 @@ type GamesPlayed = (Game & { played: boolean })[];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamesComponent implements OnInit {
+  readonly penaltyType = PenaltyType;
   data$!: Observable<GamesPlayed>;
 
   constructor(

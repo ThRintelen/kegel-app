@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +21,7 @@ import { AppointmentsComponent } from './appointments/appointments/appointments.
 import { GamesDetailComponent } from './games/games/detail/detail.component';
 import { GamesComponent } from './games/games/games.component';
 import { LiveAmountComponent } from './live-amount/live-amount.component';
+import { PenaltyComponent } from './penalty/penalty.component';
 
 // TODO Man kann ein Spiel mehr als einmal spielen. Wie wird das optisch dargestellt und kann ich abgeschlossene Spiele korrigieren?
 
@@ -30,6 +32,7 @@ import { LiveAmountComponent } from './live-amount/live-amount.component';
     GamesComponent,
     GamesDetailComponent,
     LiveAmountComponent,
+    PenaltyComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,6 +45,7 @@ import { LiveAmountComponent } from './live-amount/live-amount.component';
     MatIconModule,
     MatListModule,
     MatInputModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatCheckboxModule,
     ReactiveFormsModule,

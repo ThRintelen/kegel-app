@@ -17,8 +17,16 @@ body {
 
 mat-card {
   outline: 0;
+}
 
-  &:hover {
-    filter: brightness(0.9);
+.mat-dialog-container {
+  background-color: whitesmoke;
+}
+
+.mat-card > mat-card-actions.mat-card-actions {
+  margin: 0;
+
+  &:last-child {
+    margin-bottom: 0;
   }
 }
