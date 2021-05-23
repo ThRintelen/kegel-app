@@ -5,19 +5,19 @@ import { GamesDetailComponent } from './games/games/detail/detail.component';
 import { GamesComponent } from './games/games/games.component';
 
 const routes: Routes = [
-  {
-    path: 'appointments',
-    children: [
-      { path: '', component: AppointmentsComponent },
-      { path: ':appointmentId/games', component: GamesComponent },
-      { path: ':appointmentId/games/:gameId', component: GamesDetailComponent },
-    ],
-  },
-  { path: '**', redirectTo: 'appointments' },
+    {
+        path: 'appointments',
+        children: [
+            { path: '', component: AppointmentsComponent },
+            { path: ':appointmentId/games', component: GamesComponent },
+            { path: ':appointmentId/games/:gameId', component: GamesDetailComponent },
+        ],
+    },
+    { path: '**', redirectTo: 'appointments' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule],
 })
 export class AppRoutingModule {}

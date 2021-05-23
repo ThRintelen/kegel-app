@@ -1,20 +1,20 @@
-import { Player } from '../player/player.model';
+import { Player } from '../players/player.model';
 
 export interface Penalty {
-  id: string;
-  name: string;
-  description: string;
-  penalty: number;
-  inverse: boolean;
+    id: string;
+    name: string;
+    description: string;
+    penalty: number;
+    inverse: boolean;
 }
 
 export interface PenaltyDialogResult {
-  penalty: Penalty;
-  player: Player;
-  action: PenaltyAction;
+    penalty: Penalty;
+    player: Player;
+    action: PenaltyAction;
 }
 
 export enum PenaltyAction {
-  Add = 'add',
-  Remove = 'remove',
+    Add = 'add',
+    Remove = 'remove',
 }

@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Neuen Termin anlegen</h2>
+<mat-dialog-content class="mat-typography">
+    <div class="container">
+        <mat-form-field>
+            <mat-label>Datum *</mat-label>
+            <input (click)="datepicker.open()" [formControl]="date" matInput [matDatepicker]="datepicker" readonly />
+            <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+            <mat-datepicker #datepicker>
+                <mat-datepicker-actions>
+                    <button mat-button matDatepickerCancel>Abbrechen</button>
+                    <button mat-raised-button color="primary" matDatepickerApply>Übernehmen</button>
+                </mat-datepicker-actions>
+            </mat-datepicker>
+        </mat-form-field>
+        <mat-error *ngIf="date.touched && date.hasError('required')">Bitte ein gültiges Format auswählen.</mat-error>
+
+        <h3>Anwesend sind... *</h3>
+        <mat-selection-list #selectedPlayers>
+            <mat-list-option *ngFor="let player of players$ | async" [checkboxPosition]="'before'" [value]="player.id">
+                {{ player.name }}
+            </mat-list-option>
+        </mat-selection-list>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button
+        mat-button
+        mat-raised-button
+        color="primary"
+        (click)="onClickCreate(selectedPlayers)"
+        [disabled]="date.invalid || selectedPlayers.selectedOptions.selected.length === 0"
+    >
+        Anlegen
+    </button>
+    <button mat-button mat-dialog-close>Abbrechen</button>
+</mat-dialog-actions>
