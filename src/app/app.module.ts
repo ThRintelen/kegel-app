@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatNativeDateModule, MatRippleModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,16 +18,20 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { AmountComponent } from './amount/amount.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppointmentsComponent } from './appointments/appointments/appointments.component';
 import { CreateAppointmentComponent } from './appointments/create-appointment/create-appointment.component';
 import { GamesDetailComponent } from './games/games/detail/detail.component';
 import { GamesComponent } from './games/games/games.component';
-import { LiveAmountComponent } from './live-amount/live-amount.component';
+import { FocusPenaltyComponent } from './penalty/focus/focus.component';
 import { PenaltyComponent } from './penalty/penalty.component';
 
 // TODO Man kann ein Spiel mehr als einmal spielen. Wie wird das optisch dargestellt und kann ich abgeschlossene Spiele korrigieren?
+// TODO Wenn im Termin, ausgeben in welchen Termin man ist. Dort auch die Teilnehmer ändern.
+// TODO Strafen nur abziehen, wenn auch welche vorhanden sind
+// TODO Kegeln beenden Knopf, Strafen auflisten und "Wer hat gezahlt" markieren
 
 @NgModule({
     declarations: [
@@ -35,9 +39,10 @@ import { PenaltyComponent } from './penalty/penalty.component';
         AppointmentsComponent,
         GamesComponent,
         GamesDetailComponent,
-        LiveAmountComponent,
+        AmountComponent,
         PenaltyComponent,
         CreateAppointmentComponent,
+        FocusPenaltyComponent,
     ],
     imports: [
         BrowserModule,
@@ -52,6 +57,7 @@ import { PenaltyComponent } from './penalty/penalty.component';
         MatNativeDateModule,
         MatListModule,
         MatInputModule,
+        MatRippleModule,
         MatDialogModule,
         MatProgressSpinnerModule,
         MatFormFieldModule,

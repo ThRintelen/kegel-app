@@ -8,6 +8,6 @@ export interface AppointmentResult {
     id: string; // ID des Spiels oder der Strafe
     type: AppointmentResultType;
     playerId: string;
-    amount?: number;
+    amount: number;
     points?: number;
 }

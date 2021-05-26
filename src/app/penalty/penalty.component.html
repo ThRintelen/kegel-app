@@ -1,42 +1,33 @@
 <h2 mat-dialog-title>Strafe für {{ player.name }}</h2>
 <mat-dialog-content class="mat-typography">
-  <div class="container">
-    <mat-card *ngFor="let penalty of penatlies$ | async">
-      <mat-card-header>
-        <div mat-card-avatar>
-          <mat-icon>
-            {{ penalty.inverse ? "groups" : "person" }}
-          </mat-icon>
-        </div>
-        <mat-card-title>{{ penalty.name }}</mat-card-title>
-        <mat-card-subtitle>
-          {{ penalty.penalty | currency: "EUR" }}
-          <ng-container *ngIf="penalty.inverse">
-            für alle anderen
-          </ng-container>
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>{{ penalty.description }}</p>
-      </mat-card-content>
-      <mat-card-actions class="actions">
-        <button
-          (click)="onClickButton(penalty, player, penaltyAction.Add)"
-          mat-mini-fab
-          color="primary"
-        >
-          <mat-icon>add</mat-icon>
-        </button>
-        <button
-          (click)="onClickButton(penalty, player, penaltyAction.Remove)"
-          mat-mini-fab
-        >
-          <mat-icon>remove</mat-icon>
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+    <div class="container">
+        <mat-card *ngFor="let penalty of penatlies$ | async">
+            <mat-card-header>
+                <div mat-card-avatar>
+                    <mat-icon>
+                        {{ penalty.inverse ? 'groups' : 'person' }}
+                    </mat-icon>
+                </div>
+                <mat-card-title>{{ penalty.name }}</mat-card-title>
+                <mat-card-subtitle>
+                    {{ penalty.penalty | currency: 'EUR' }}
+                    <ng-container *ngIf="penalty.inverse"> für alle anderen </ng-container>
+                </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p>{{ penalty.description }}</p>
+            </mat-card-content>
+            <mat-card-actions class="actions">
+                <button (click)="onClickButton(penalty, player, penaltyAction.Add)" mat-mini-fab color="primary">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <button (click)="onClickButton(penalty, player, penaltyAction.Remove)" mat-mini-fab>
+                    <mat-icon>remove</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>Abbrechen</button>
+    <button mat-button mat-dialog-close>Abbrechen</button>
 </mat-dialog-actions>

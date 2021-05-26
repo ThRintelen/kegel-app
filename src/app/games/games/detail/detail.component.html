@@ -1,48 +1,43 @@
 <div class="container" *ngIf="data$ | async as data">
-  <h1>{{ data.game.name }}</h1>
-  <p *ngIf="data.game.penalty === penaltyType.Flex">
-    Bitte zu jedem Spieler den fälligen Geldbetrag angeben.
-  </p>
+    <h1>{{ data.game.name }}</h1>
+    <p *ngIf="data.game.penalty === penaltyType.Flex">Bitte zu jedem Spieler den fälligen Geldbetrag angeben.</p>
 
-  <p *ngIf="data.game.penalty !== penaltyType.Flex">
-    Bitte die Spieler markieren, die dieses Spiel verloren haben.<br />
-    Die Strafe pro Spieler beträgt
-    <b>{{ data.game.penalty | currency: "EUR" }}</b>
-  </p>
-  <form [formGroup]="form">
-    <mat-selection-list>
-      <mat-list-item *ngFor="let player of data.players; let last = last">
-        <div class="row">
-          {{ player.name }}
+    <p *ngIf="data.game.penalty !== penaltyType.Flex">
+        Bitte die Spieler markieren, die dieses Spiel verloren haben.<br />
+        Die Strafe pro Spieler beträgt
+        <b>{{ data.game.penalty | currency: 'EUR' }}</b>
+    </p>
+    <form [formGroup]="form">
+        <mat-selection-list>
+            <mat-list-item
+                *ngFor="let player of data.players; let last = last"
+                matRipple
+                [matRippleDisabled]="data.game.penalty === penaltyType.Flex"
+            >
+                <div class="row" (click)="onClickRow(player)">
+                    <div class="field">
+                        <mat-checkbox
+                            *ngIf="data.game.penalty !== penaltyType.Flex"
+                            [formControlName]="player.id"
+                            (click)="$event.stopPropagation()"
+                        ></mat-checkbox>
 
-          <button mat-icon-button (click)="openDialog(player, data.players)">
-            <mat-icon>euro_symbol</mat-icon>
-          </button>
+                        <mat-form-field *ngIf="data.game.penalty === penaltyType.Flex" class="amount-field">
+                            <mat-label>Betrag in €</mat-label>
+                            <input [formControlName]="player.id" type="number" matInput />
+                        </mat-form-field>
+                    </div>
+                    <div class="player-name">{{ player.name }}</div>
 
-          <mat-form-field
-            appearance="fill"
-            *ngIf="data.game.penalty === penaltyType.Flex"
-          >
-            <mat-label>Betrag in €</mat-label>
-            <input [formControlName]="player.id" type="number" matInput />
-          </mat-form-field>
+                    <button mat-mini-fab (click)="openDialog(player, data.players); $event.stopPropagation()">
+                        <mat-icon>gavel</mat-icon>
+                    </button>
+                </div>
+                <mat-divider *ngIf="!last"> </mat-divider>
+            </mat-list-item>
+        </mat-selection-list>
 
-          <mat-checkbox
-            *ngIf="data.game.penalty !== penaltyType.Flex"
-            [formControlName]="player.id"
-          ></mat-checkbox>
-        </div>
-        <mat-divider *ngIf="!last"> </mat-divider>
-      </mat-list-item>
-    </mat-selection-list>
-
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onClickSubmit(data.game, data.players)"
-    >
-      Speichern
-    </button>
-    <button mat-raised-button [routerLink]="['..']">Zurück</button>
-  </form>
+        <button mat-raised-button color="primary" (click)="onClickSubmit(data.game, data.players)">Speichern</button>
+        <button mat-raised-button [routerLink]="['..']">Zurück</button>
+    </form>
 </div>

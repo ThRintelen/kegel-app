@@ -1,24 +1,17 @@
 <mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <a [routerLink]="['/']">Kegel APP</a>
-    <div class="spacer"></div>
-    <button mat-icon-button (click)="sidenav.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
-  </mat-toolbar-row>
+    <mat-toolbar-row>
+        <a [routerLink]="['/']">Kegel APP</a>
+        <div class="spacer"></div>
+        <button mat-icon-button (click)="sidenav.toggle()">
+            <mat-icon>menu</mat-icon>
+        </button>
+    </mat-toolbar-row>
 </mat-toolbar>
 
 <mat-sidenav-container>
-  <mat-sidenav-content><router-outlet></router-outlet></mat-sidenav-content>
-  <mat-sidenav
-    [opened]="true"
-    [fixedInViewport]="true"
-    [fixedTopGap]="64"
-    position="end"
-    mode="side"
-    opened
-    #sidenav
-  >
-    <app-live-amount></app-live-amount>
-  </mat-sidenav>
+    <mat-sidenav-content><router-outlet></router-outlet></mat-sidenav-content>
+    <mat-sidenav [opened]="true" [fixedInViewport]="true" [fixedTopGap]="64" position="end" mode="side" opened #sidenav>
+        <app-amount></app-amount>
+        <app-focus-penalty [penaltyId]="'1'" [count]="5"></app-focus-penalty>
+    </mat-sidenav>
 </mat-sidenav-container>

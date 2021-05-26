@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AppointmentResult } from './store.model';
+import { map } from 'rxjs/operators';
+import { AppointmentResult, AppointmentResultType } from './store.model';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +13,16 @@ export class AppointmentStoreService {
 
     getResults$(): Observable<AppointmentResult[]> {
         return this.results$.asObservable();
+    }
+
+    getResultsByPenaltyId$(penaltyId: string): Observable<AppointmentResult[]> {
+        return this.results$
+            .asObservable()
+            .pipe(
+                map(results =>
+                    results.filter(result => result.type === AppointmentResultType.Penalty && result.id === penaltyId),
+                ),
+            );
     }
 
     addResult(result: AppointmentResult) {

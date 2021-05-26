@@ -1,0 +1,7 @@
+<div class="wrapper">
+    <h2>Top {{ count }} Pudel</h2>
+    <div *ngFor="let data of data$ | async" class="row">
+        <div>{{ data.name }}</div>
+        <div>{{ data.count }}</div>
+    </div>
+</div>

@@ -1,43 +1,61 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Player } from './player.model';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayersService {
-    constructor() {}
+    private players: Player[] = [
+        {
+            id: '1',
+            name: 'Bastian Linsen',
+        },
+        {
+            id: '2',
+            name: 'Björn Mende',
+        },
+        {
+            id: '3',
+            name: 'Thorsten Rintelen',
+        },
+        {
+            id: '4',
+            name: 'Max Wolf',
+        },
+        {
+            id: '5',
+            name: 'Dominik Arntz',
+        },
+        {
+            id: '6',
+            name: 'Daniel Siebers',
+        },
+        {
+            id: '7',
+            name: 'Florian Krebbers',
+        },
+        {
+            id: '8',
+            name: 'Jörg Heselmann',
+        },
+        {
+            id: '9',
+            name: 'Alexander Japs',
+        },
+        {
+            id: '10',
+            name: 'Sebastian Berson',
+        },
+    ];
 
-    // TODO Alle Spieler eines Clubs und alle Spieler zu einem Termin
-    // TODO Mit HttpApiMock arbeiten
+    // TODO ClubId pber URL
     getPlayers$(): Observable<Player[]> {
-        const players: Player[] = [
-            {
-                id: 'csdcs-csdc-dscs',
-                name: 'Herbert Peters',
-            },
-            {
-                id: 'dscds-cdscds',
-                name: 'Thorsten Rintelen',
-            },
-        ];
-
-        return of(players);
+        return of(this.players).pipe(map(player => player.sort((a, b) => a.name.localeCompare(b.name))));
     }
 
-    getPlayersOfAppointment$(appointmentId: number): Observable<Player[]> {
-        console.log(appointmentId);
-        const players: Player[] = [
-            {
-                id: 'csdcs-csdc-dscs',
-                name: 'Herbert Peters',
-            },
-            {
-                id: 'dscds-cdscds',
-                name: 'Thorsten Rintelen',
-            },
-        ];
-
-        return of(players);
+    getPlayersOfAppointment$(_appointmentId: number): Observable<Player[]> {
+        return of(this.players).pipe(map(player => player.sort((a, b) => a.name.localeCompare(b.name))));
     }
 }

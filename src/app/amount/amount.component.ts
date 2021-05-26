@@ -1,17 +1,19 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppointmentStoreService } from '../appointments/store.service';
 import { PlayersService } from '../players/player.service';
 
+@UntilDestroy()
 @Component({
-    selector: 'app-live-amount',
-    templateUrl: './live-amount.component.html',
-    styleUrls: ['./live-amount.component.scss'],
+    selector: 'app-amount',
+    templateUrl: './amount.component.html',
+    styleUrls: ['./amount.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LiveAmountComponent implements OnInit {
+export class AmountComponent implements OnInit {
     data$!: Observable<{ name: string; amount: number | undefined }[]>;
 
     constructor(
@@ -20,19 +22,16 @@ export class LiveAmountComponent implements OnInit {
         private readonly route: ActivatedRoute,
     ) {}
 
-    // TODO unsubscribe
     // TODO Berchung in einen Servie auslagern
-    // TODO Rename - live
 
     ngOnInit() {
         this.data$ = this.route.params.pipe(
+            untilDestroyed(this),
             switchMap(({ appointmentId }) => this.playersService.getPlayersOfAppointment$(appointmentId)),
             switchMap(players =>
                 this.appointmentStoreService.getResults$().pipe(map(results => ({ results, players }))),
             ),
             map(({ results, players }) =>
-                // TODO Sortieren nach Betrag
-                // TODO Max X Einträge anzeigen
                 players.map(player => {
                     const amount = results
                         .filter(({ playerId }) => playerId === player.id)
@@ -42,6 +41,7 @@ export class LiveAmountComponent implements OnInit {
                     return { name: player.name, amount };
                 }),
             ),
+            map(result => result.sort((a, b) => ((a.amount || 0) > (b.amount || 0) ? -1 : 1))),
         );
     }
 }

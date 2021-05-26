@@ -1,11 +1,11 @@
 export interface Game {
-  id: string;
-  name: string;
-  description: string;
-  groupGame: boolean; // Gruppenspiel ja/nein
-  penalty: number | PenaltyType; // Strafgeld für die Verlierer
+    id: string;
+    name: string;
+    description: string;
+    groupGame: boolean;
+    penalty: number | PenaltyType;
 }
 
 export enum PenaltyType {
-  Flex = 'flex',
+    Flex = 'flex',
 }

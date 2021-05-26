@@ -14,9 +14,9 @@ import { PlayersService } from '../../../players/player.service';
 import { Game, PenaltyType } from '../../games.model';
 import { GamesService } from '../../games.service';
 
-// TODO Seite optisch aufbereiten
-// TODO Validierungen
+// TODO Validierungen, kurze Warnung beim speichern
 // TODO Auslagern der Berechnungen in Services
+
 @UntilDestroy()
 @Component({
     selector: 'app-detail',
@@ -77,6 +77,15 @@ export class GamesDetailComponent implements OnInit {
 
             this.router.navigate(['/appointments', appointmentId, 'games']);
         });
+    }
+
+    onClickRow(player: Player) {
+        const field = this.form.get(player.id);
+        if (!field) {
+            return;
+        }
+
+        field.setValue(!field.value);
     }
 
     openDialog(player: Player, players: Player[]) {
