@@ -11,7 +11,7 @@
         <mat-card *ngFor="let appointment of appointments" [routerLink]="['/appointments', appointment.id, 'games']">
             <mat-card-header>
                 <div mat-card-avatar><mat-icon>insert_invitation</mat-icon></div>
-                <mat-card-title>{{ appointment.date | date }}</mat-card-title>
+                <mat-card-title>{{ appointment.date.toDate() | date }}</mat-card-title>
                 <mat-card-subtitle> {{ appointment.presentMembers.length }} anwesend </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>

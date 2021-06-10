@@ -11,8 +11,16 @@
     }
 }
 
+.column {
+    flex-grow: 1;
+
+    &:first-of-type {
+        margin-right: 27px;
+    }
+}
+
 .container {
-    display: block;
+    justify-content: space-between;
 }
 
 mat-form-field {
@@ -45,7 +53,7 @@ button {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 60px;
+    height: 70px;
 
     button {
         margin: 0;

@@ -1,0 +1,7 @@
+<mat-sidenav-container>
+    <mat-sidenav-content><router-outlet></router-outlet></mat-sidenav-content>
+    <mat-sidenav [opened]="true" [fixedInViewport]="true" [fixedTopGap]="64" position="end" mode="side" opened>
+        <app-amount></app-amount>
+        <app-focus-penalty [penaltyId]="'1'" [count]="5"></app-focus-penalty>
+    </mat-sidenav>
+</mat-sidenav-container>

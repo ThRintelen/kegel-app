@@ -1,34 +1,25 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AppointmentResult, AppointmentResultType } from './store.model';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { AppointmentResult } from './store.model';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AppointmentStoreService {
-    private results$ = new BehaviorSubject<AppointmentResult[]>([]);
-
-    constructor() {}
+    constructor(private readonly firestore: AngularFirestore) {}
 
     getResults$(): Observable<AppointmentResult[]> {
-        return this.results$.asObservable();
+        return this.firestore.collection<AppointmentResult>('results').valueChanges();
     }
 
     getResultsByPenaltyId$(penaltyId: string): Observable<AppointmentResult[]> {
-        return this.results$
-            .asObservable()
-            .pipe(
-                map(results =>
-                    results.filter(result => result.type === AppointmentResultType.Penalty && result.id === penaltyId),
-                ),
-            );
+        return this.firestore
+            .collection<AppointmentResult>('results', ref => ref.where('contextId', '==', penaltyId))
+            .valueChanges();
     }
 
     addResult(result: AppointmentResult) {
-        const currentResults = [...this.results$.value];
-        currentResults.push(result);
-
-        this.results$.next(currentResults);
+        this.firestore.collection('results').add(result);
     }
 }

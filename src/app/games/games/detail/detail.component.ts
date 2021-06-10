@@ -3,9 +3,11 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { Observable, zip } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
-import { AppointmentResultType } from 'src/app/appointments/store.model';
+import { Appointment } from 'src/app/appointments/appointments.model';
+import { AppointmentsService } from 'src/app/appointments/appointments.service';
+import { AppointmentResult, AppointmentResultType } from 'src/app/appointments/store.model';
 import { AppointmentStoreService } from 'src/app/appointments/store.service';
 import { PenaltyComponent } from 'src/app/penalty/penalty.component';
 import { PenaltyAction, PenaltyDialogResult } from 'src/app/penalty/penalty.model';
@@ -13,9 +15,6 @@ import { Player } from '../../../players/player.model';
 import { PlayersService } from '../../../players/player.service';
 import { Game, PenaltyType } from '../../games.model';
 import { GamesService } from '../../games.service';
-
-// TODO Validierungen, kurze Warnung beim speichern
-// TODO Auslagern der Berechnungen in Services
 
 @UntilDestroy()
 @Component({
@@ -26,7 +25,7 @@ import { GamesService } from '../../games.service';
 })
 export class GamesDetailComponent implements OnInit {
     penaltyType = PenaltyType;
-    data$!: Observable<{ players: Player[]; game: Game }>;
+    data$: Observable<{ players: Player[]; game: Game; appointment: Appointment | undefined }> = of();
 
     form = new FormGroup({});
 
@@ -36,44 +35,62 @@ export class GamesDetailComponent implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly appointmentStoreService: AppointmentStoreService,
+        private readonly appointmentsService: AppointmentsService,
         private readonly dialog: MatDialog,
     ) {}
 
     ngOnInit() {
-        const players$ = this.route.params.pipe(
-            switchMap(({ appointmentId }) => this.playersService.getPlayersOfAppointment$(appointmentId)),
-            tap(players => {
+        this.data$ = this.route.params.pipe(
+            switchMap(({ gameId, appointmentId }) =>
+                this.gamesService.getGame$(gameId).pipe(map(game => ({ game, appointmentId }))),
+            ),
+            switchMap(({ game, appointmentId }) =>
+                this.appointmentsService
+                    .getAppointment$(appointmentId)
+                    .pipe(map(appointment => ({ appointment, game }))),
+            ),
+            switchMap(({ appointment, game }) =>
+                this.playersService
+                    .getPresentPlayers$(appointment?.presentMembers)
+                    .pipe(map(players => ({ players, game, appointment }))),
+            ),
+            tap(({ players }) => {
                 players.forEach(player => {
                     const field = new FormControl('');
                     this.form.addControl(player.id, field);
                 });
             }),
         );
-
-        const game$ = this.route.params.pipe(switchMap(({ gameId }) => this.gamesService.getGame$(gameId)));
-
-        this.data$ = zip(players$, game$).pipe(map(data => ({ game: data[1], players: data[0] })));
     }
 
-    onClickSubmit(game: Game, players: Player[]) {
-        this.route.params.pipe(untilDestroyed(this)).subscribe(({ appointmentId }) => {
-            players.forEach(player => {
-                let amount = 0;
+    onClickSubmit(game: Game, players: Player[], appointmentId: string | undefined) {
+        // TODO In result service umwandeln und verschieben
+        // TODO rechte Seite aubauen, Strafen, Spieler eines Termins cachen.
+        // TODO Ladebalnken und bestätigung beim speichern?!
 
-                if (game.penalty === PenaltyType.Flex) {
-                    amount = this.form.value[player.id];
-                } else if (this.form.value[player.id]) {
-                    amount = game.penalty;
-                }
+        // TODO Validierungen, kurze Warnung / Bestätigung beim speichern
+        if (!appointmentId) {
+            throw new Error('No appointment id found');
+        }
 
+        players.forEach(player => {
+            let amount = 0;
+
+            if (game.penalty === PenaltyType.Flex) {
+                amount = this.form.value[player.id];
+            } else if (this.form.value[player.id]) {
+                amount = game.penalty;
+            }
+
+            if (amount) {
                 this.appointmentStoreService.addResult({
                     appointmentId,
-                    id: game.id,
+                    contextId: game.id,
                     type: AppointmentResultType.Game,
                     playerId: player.id,
                     amount,
                 });
-            });
+            }
 
             this.router.navigate(['/appointments', appointmentId, 'games']);
         });
@@ -88,6 +105,7 @@ export class GamesDetailComponent implements OnInit {
         field.setValue(!field.value);
     }
 
+    // TODO Code in Services auslagern
     openDialog(player: Player, players: Player[]) {
         this.dialog
             .open(PenaltyComponent, {
@@ -104,9 +122,9 @@ export class GamesDetailComponent implements OnInit {
                 ),
             )
             .subscribe(({ dialogResponse, appointmentId }) => {
-                const result = {
+                const result: AppointmentResult = {
                     appointmentId,
-                    id: dialogResponse.penalty.id,
+                    contextId: dialogResponse.penalty.id,
                     type: AppointmentResultType.Penalty,
                     playerId: dialogResponse.player.id,
                     amount: dialogResponse.penalty.penalty,

@@ -15,10 +15,13 @@
         <mat-error *ngIf="date.touched && date.hasError('required')">Bitte ein gültiges Format auswählen.</mat-error>
 
         <h3>Anwesend sind... *</h3>
+        <ng-template #spinner><mat-spinner></mat-spinner></ng-template>
         <mat-selection-list #selectedPlayers>
-            <mat-list-option *ngFor="let player of players$ | async" [checkboxPosition]="'before'" [value]="player.id">
-                {{ player.name }}
-            </mat-list-option>
+            <ng-container *ngIf="players$ | async as players; else spinner">
+                <mat-list-option *ngFor="let player of players" [checkboxPosition]="'before'" [value]="player.id">
+                    {{ player.name }}
+                </mat-list-option>
+            </ng-container>
         </mat-selection-list>
     </div>
 </mat-dialog-content>

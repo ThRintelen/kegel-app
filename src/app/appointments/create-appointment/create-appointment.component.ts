@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelectionList } from '@angular/material/list';
 import { Observable } from 'rxjs';
 import { Player } from '../../players/player.model';
-import { Appointment } from '../appointments.model';
+import { CreateAppointmentData } from '../appointments.model';
 
 @Component({
     templateUrl: './create-appointment.component.html',
@@ -20,14 +20,11 @@ export class CreateAppointmentComponent {
     ) {}
 
     onClickCreate(selectedPlayers: MatSelectionList) {
-        const appointment: Appointment = {
-            id: null,
+        const data: CreateAppointmentData = {
             date: this.date.value,
             presentMembers: selectedPlayers.selectedOptions.selected.map(({ value }) => value),
-            playedGames: [],
-            openPaymentAmount: 0,
         };
 
-        this.dialogRef.close(appointment);
+        this.dialogRef.close(data);
     }
 }

@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { merge, Observable, of, Subject } from 'rxjs';
-import { concatMap, filter, map, switchMap } from 'rxjs/operators';
-import { PlayersService } from '../../players/player.service';
-import { Appointment } from '../appointments.model';
+import { Observable, of } from 'rxjs';
+import { concatMap, filter, map, switchMap, tap } from 'rxjs/operators';
+import { ClubService } from 'src/app/clubs/club.service';
+import { PlayersService } from 'src/app/players/player.service';
+import { Appointment, CreateAppointmentData } from '../appointments.model';
 import { AppointmentsService } from '../appointments.service';
 import { CreateAppointmentComponent } from '../create-appointment/create-appointment.component';
 
@@ -17,41 +19,53 @@ import { CreateAppointmentComponent } from '../create-appointment/create-appoint
 })
 export class AppointmentsComponent implements OnInit {
     appointments$: Observable<Appointment[]> = of([]);
-    createdAppointment$ = new Subject<Appointment>();
 
     constructor(
         private readonly playerService: PlayersService,
+        private readonly clubService: ClubService,
         private readonly appointmentsService: AppointmentsService,
         private readonly dialog: MatDialog,
+        private readonly cdRef: ChangeDetectorRef,
+        private readonly snackBar: MatSnackBar,
     ) {}
 
     ngOnInit() {
-        this.appointments$ = this.appointmentsService.getAppointments().pipe(
-            switchMap(appointments =>
-                merge(
-                    of(appointments),
-                    this.createdAppointment$.pipe(map(appointment => [...appointments, appointment])),
-                ),
-            ),
-            // TODO Sortierung der Daten geht noch nicht
-            map(appointments => appointments.sort((a, b) => (a.date > b.date ? 1 : -1))),
-        );
+        this.appointments$ = this.getAppointments$();
     }
 
     onClickCreate() {
+        const data$ = this.clubService.club$.pipe(switchMap(club => this.playerService.getPlayers$(club?.id)));
+
         this.dialog
             .open(CreateAppointmentComponent, {
                 minWidth: '50%',
-                data: this.playerService.getPlayers$(),
+                data: data$,
             })
             .afterClosed()
             .pipe(
                 untilDestroyed(this),
-                filter(appointment => !!appointment),
-                concatMap((appointment: Appointment) => this.appointmentsService.createAppointment(appointment)),
+                filter(data => !!data),
+                switchMap((data: CreateAppointmentData) => this.clubService.club$.pipe(map(club => ({ data, club })))),
+                concatMap(({ data, club }) => {
+                    if (club === null) {
+                        throw new Error('club not found');
+                    }
+
+                    return this.appointmentsService.createAppointment({
+                        ...data,
+                        openPaymentAmount: 0,
+                        clubId: club.id,
+                    });
+                }),
+                tap(() => this.snackBar.open('Termin erfolgreich erstellt')),
             )
-            .subscribe(appointment => {
-                this.createdAppointment$.next(appointment);
+            .subscribe(() => {
+                this.appointments$ = this.getAppointments$();
+                this.cdRef.markForCheck();
             });
+    }
+
+    private getAppointments$(): Observable<Appointment[]> {
+        return this.clubService.club$.pipe(switchMap(club => this.appointmentsService.getAppointments$(club?.id)));
     }
 }

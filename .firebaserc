@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "kegel-app-a7f05": {
+      "hosting": {
+        "kegel-app": [
+          "kegel-app-a7f05"
+        ]
+      }
+    }
+  }
+}

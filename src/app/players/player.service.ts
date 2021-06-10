@@ -1,61 +1,54 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { BehaviorSubject, Observable, of, zip } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 import { Player } from './player.model';
 
+@UntilDestroy()
 @Injectable({
     providedIn: 'root',
 })
 export class PlayersService {
-    private players: Player[] = [
-        {
-            id: '1',
-            name: 'Bastian Linsen',
-        },
-        {
-            id: '2',
-            name: 'Björn Mende',
-        },
-        {
-            id: '3',
-            name: 'Thorsten Rintelen',
-        },
-        {
-            id: '4',
-            name: 'Max Wolf',
-        },
-        {
-            id: '5',
-            name: 'Dominik Arntz',
-        },
-        {
-            id: '6',
-            name: 'Daniel Siebers',
-        },
-        {
-            id: '7',
-            name: 'Florian Krebbers',
-        },
-        {
-            id: '8',
-            name: 'Jörg Heselmann',
-        },
-        {
-            id: '9',
-            name: 'Alexander Japs',
-        },
-        {
-            id: '10',
-            name: 'Sebastian Berson',
-        },
-    ];
+    presentPlayers$ = new BehaviorSubject<Player[]>([]);
 
-    // TODO ClubId pber URL
-    getPlayers$(): Observable<Player[]> {
-        return of(this.players).pipe(map(player => player.sort((a, b) => a.name.localeCompare(b.name))));
+    constructor(private readonly firestore: AngularFirestore) {}
+
+    getPlayers$(clubId: string | undefined): Observable<Player[]> {
+        if (clubId === undefined) {
+            return of([]);
+        }
+
+        return this.firestore
+            .collection<Player>('players', ref => ref.where('clubId', '==', clubId).orderBy('name'))
+            .get()
+            .pipe(map(data => data.docs.map(doc => ({ name: doc.data().name, id: doc.id }))));
     }
 
-    getPlayersOfAppointment$(_appointmentId: number): Observable<Player[]> {
-        return of(this.players).pipe(map(player => player.sort((a, b) => a.name.localeCompare(b.name))));
+    getPresentPlayers$(presentPlayers: string[] | undefined): Observable<Player[]> {
+        if (this.presentPlayers$.value.length > 0) {
+            return this.presentPlayers$;
+        }
+
+        const streams$: Observable<Player>[] = [];
+
+        presentPlayers?.forEach(playerId => {
+            streams$.push(
+                this.firestore
+                    .collection<Player>('players')
+                    .doc(playerId)
+                    .get()
+                    .pipe(
+                        filter(doc => doc.exists),
+                        map(doc => <Player>{ ...doc.data(), id: doc.id }),
+                    ),
+            );
+        });
+
+        return zip(...streams$).pipe(
+            untilDestroyed(this),
+            map(players => players.sort((a, b) => a.name.localeCompare(b.name))),
+            tap(players => this.presentPlayers$.next(players)),
+        );
     }
 }

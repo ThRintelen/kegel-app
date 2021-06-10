@@ -1,7 +1,14 @@
+import { Timestamp } from '@firebase/firestore-types';
+
 export interface Appointment {
-    id: string | null;
-    date: string;
+    id: string;
+    date: Timestamp;
     presentMembers: string[];
-    playedGames: string[];
     openPaymentAmount: number;
+    clubId: string;
+}
+
+export interface CreateAppointmentData {
+    presentMembers: string[];
+    date: Timestamp;
 }
