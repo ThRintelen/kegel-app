@@ -7,10 +7,10 @@ import { Observable, of } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { Appointment } from 'src/app/appointments/appointments.model';
 import { AppointmentsService } from 'src/app/appointments/appointments.service';
-import { AppointmentResult, AppointmentResultType } from 'src/app/appointments/store.model';
-import { AppointmentStoreService } from 'src/app/appointments/store.service';
 import { PenaltyComponent } from 'src/app/penalty/penalty.component';
 import { PenaltyAction, PenaltyDialogResult } from 'src/app/penalty/penalty.model';
+import { AppointmentResult, AppointmentResultType } from 'src/app/results/results.model';
+import { AppointmentResultService } from 'src/app/results/results.service';
 import { Player } from '../../../players/player.model';
 import { PlayersService } from '../../../players/player.service';
 import { Game, PenaltyType } from '../../games.model';
@@ -34,7 +34,7 @@ export class GamesDetailComponent implements OnInit {
         private readonly gamesService: GamesService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly appointmentStoreService: AppointmentStoreService,
+        private readonly appointmentResultService: AppointmentResultService,
         private readonly appointmentsService: AppointmentsService,
         private readonly dialog: MatDialog,
     ) {}
@@ -64,8 +64,7 @@ export class GamesDetailComponent implements OnInit {
     }
 
     onClickSubmit(game: Game, players: Player[], appointmentId: string | undefined) {
-        // TODO In result service umwandeln und verschieben
-        // TODO rechte Seite aubauen, Strafen, Spieler eines Termins cachen.
+        // TODO rechte Seite aubauen, Spieler eines Termins cachen.
         // TODO Ladebalnken und bestätigung beim speichern?!
 
         // TODO Validierungen, kurze Warnung / Bestätigung beim speichern
@@ -83,7 +82,7 @@ export class GamesDetailComponent implements OnInit {
             }
 
             if (amount) {
-                this.appointmentStoreService.addResult({
+                this.appointmentResultService.addResult({
                     appointmentId,
                     contextId: game.id,
                     type: AppointmentResultType.Game,
@@ -115,11 +114,11 @@ export class GamesDetailComponent implements OnInit {
             })
             .afterClosed()
             .pipe(
-                untilDestroyed(this),
                 filter(dialogResponse => !!dialogResponse),
                 switchMap((dialogResponse: PenaltyDialogResult) =>
                     this.route.params.pipe(map(({ appointmentId }) => ({ dialogResponse, appointmentId }))),
                 ),
+                untilDestroyed(this),
             )
             .subscribe(({ dialogResponse, appointmentId }) => {
                 const result: AppointmentResult = {
@@ -135,13 +134,13 @@ export class GamesDetailComponent implements OnInit {
                         players
                             .filter(({ id }) => id !== dialogResponse.player.id)
                             .forEach(player => {
-                                this.appointmentStoreService.addResult({
+                                this.appointmentResultService.addResult({
                                     ...result,
                                     playerId: player.id,
                                 });
                             });
                     } else {
-                        this.appointmentStoreService.addResult(result);
+                        this.appointmentResultService.addResult(result);
                     }
                 }
 
@@ -152,14 +151,14 @@ export class GamesDetailComponent implements OnInit {
                         players
                             .filter(({ id }) => id !== dialogResponse.player.id)
                             .forEach(player => {
-                                this.appointmentStoreService.addResult({
+                                this.appointmentResultService.addResult({
                                     ...result,
                                     amount,
                                     playerId: player.id,
                                 });
                             });
                     } else {
-                        this.appointmentStoreService.addResult({ ...result, amount });
+                        this.appointmentResultService.addResult({ ...result, amount });
                     }
                 }
             });

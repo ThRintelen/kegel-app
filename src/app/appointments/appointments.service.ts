@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { PlayersService } from '../players/player.service';
 import { Appointment } from './appointments.model';
 
 type NewAppointment = Omit<Appointment, 'id'>;
@@ -12,7 +13,12 @@ type NewAppointment = Omit<Appointment, 'id'>;
 export class AppointmentsService {
     appointmen$ = new BehaviorSubject<Appointment | undefined>(undefined);
 
-    constructor(private readonly firestore: AngularFirestore) {}
+    constructor(private readonly firestore: AngularFirestore, private readonly playersService: PlayersService) {}
+
+    resetAppointment() {
+        this.appointmen$.next(undefined);
+        this.playersService.resetPresenPlayers();
+    }
 
     getAppointment$(appointmentId: string | undefined): Observable<Appointment> {
         if (this.appointmen$.value) {

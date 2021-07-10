@@ -43,7 +43,6 @@ export class AppointmentsComponent implements OnInit {
             })
             .afterClosed()
             .pipe(
-                untilDestroyed(this),
                 filter(data => !!data),
                 switchMap((data: CreateAppointmentData) => this.clubService.club$.pipe(map(club => ({ data, club })))),
                 concatMap(({ data, club }) => {
@@ -58,6 +57,7 @@ export class AppointmentsComponent implements OnInit {
                     });
                 }),
                 tap(() => this.snackBar.open('Termin erfolgreich erstellt')),
+                untilDestroyed(this),
             )
             .subscribe(() => {
                 this.appointments$ = this.getAppointments$();

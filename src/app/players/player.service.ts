@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { BehaviorSubject, Observable, of, zip } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 import { Player } from './player.model';
 
-@UntilDestroy()
 @Injectable({
     providedIn: 'root',
 })
@@ -23,6 +21,10 @@ export class PlayersService {
             .collection<Player>('players', ref => ref.where('clubId', '==', clubId).orderBy('name'))
             .get()
             .pipe(map(data => data.docs.map(doc => ({ name: doc.data().name, id: doc.id }))));
+    }
+
+    resetPresenPlayers() {
+        this.presentPlayers$.next([]);
     }
 
     getPresentPlayers$(presentPlayers: string[] | undefined): Observable<Player[]> {
@@ -46,7 +48,6 @@ export class PlayersService {
         });
 
         return zip(...streams$).pipe(
-            untilDestroyed(this),
             map(players => players.sort((a, b) => a.name.localeCompare(b.name))),
             tap(players => this.presentPlayers$.next(players)),
         );

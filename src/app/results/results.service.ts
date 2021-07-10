@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { AppointmentResult } from './store.model';
+import { AppointmentResult } from './results.model';
 
 @Injectable({
     providedIn: 'root',
 })
-export class AppointmentStoreService {
+export class AppointmentResultService {
     constructor(private readonly firestore: AngularFirestore) {}
 
-    getResults$(): Observable<AppointmentResult[]> {
-        return this.firestore.collection<AppointmentResult>('results').valueChanges();
+    getResults$(appointmentId: string): Observable<AppointmentResult[]> {
+        return this.firestore
+            .collection<AppointmentResult>('results', ref => ref.where('appointmentId', '==', appointmentId))
+            .valueChanges();
     }
 
     getResultsByPenaltyId$(penaltyId: string): Observable<AppointmentResult[]> {

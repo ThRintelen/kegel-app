@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { AppointmentsService } from '../appointments/appointments.service';
+import { PlayersService } from '../players/player.service';
+import { AppointmentResultService } from '../results/results.service';
 
 @Component({
     selector: 'app-amount',
@@ -10,29 +15,34 @@ import { Observable } from 'rxjs';
 export class AmountComponent implements OnInit {
     data$!: Observable<{ name: string; amount: number | undefined }[]>;
 
-    constructor() // private readonly appointmentStoreService: AppointmentStoreService,
-    // private readonly playersService: PlayersService,
-    // private readonly route: ActivatedRoute,
-    {}
-
-    // TODO Berchung in einen Servie auslagern
+    constructor(
+        private readonly route: ActivatedRoute,
+        private readonly playersService: PlayersService,
+        private readonly appointmentsService: AppointmentsService,
+        private readonly appointmentResultService: AppointmentResultService,
+    ) {}
 
     ngOnInit() {
-        // this.data$ = this.route.params.pipe(
-        //     switchMap(({ appointmentId }) => this.playersService.getPlayersOfAppointment$(appointmentId)),
-        //     switchMap(players =>
-        //         this.appointmentStoreService.getResults$().pipe(map(results => ({ results, players }))),
-        //     ),
-        //     map(({ results, players }) =>
-        //         players.map(player => {
-        //             const amount = results
-        //                 .filter(({ playerId }) => playerId === player.id)
-        //                 .map(({ amount }) => amount)
-        //                 .reduce((prev, curr) => (prev || 0) + (curr || 0), 0);
-        //             return { name: player.name, amount };
-        //         }),
-        //     ),
-        //     map(result => result.sort((a, b) => ((a.amount || 0) > (b.amount || 0) ? -1 : 1))),
-        // );
+        this.data$ = this.route.params.pipe(
+            switchMap(({ appointmentId }) => this.appointmentsService.getAppointment$(appointmentId)),
+            switchMap(appointment =>
+                this.playersService
+                    .getPresentPlayers$(appointment.presentMembers)
+                    .pipe(map(players => ({ appointment, players }))),
+            ),
+            switchMap(({ appointment, players }) =>
+                this.appointmentResultService.getResults$(appointment.id).pipe(map(results => ({ results, players }))),
+            ),
+            map(({ results, players }) =>
+                players.map(player => {
+                    const amount = results
+                        .filter(({ playerId }) => playerId === player.id)
+                        .map(({ amount }) => amount)
+                        .reduce((prev, curr) => (prev || 0) + (curr || 0), 0);
+                    return { name: player.name, amount };
+                }),
+            ),
+            map(result => result.sort((a, b) => ((a.amount || 0) > (b.amount || 0) ? -1 : 1))),
+        );
     }
 }
